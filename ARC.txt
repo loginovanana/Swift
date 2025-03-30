@@ -1,0 +1,227 @@
+import Foundation
+
+// MARK: - Задание 1: Структуры для легкового автомобиля и грузовика
+
+struct Car: Hashable { // Добавляем соответствие Hashable
+    let brand: String
+    let year: Int
+    var trunkCapacity: Double
+    var isEngineRunning: Bool = false
+    var areWindowsOpen: Bool = false
+    var trunkFilledVolume: Double = 0.0 // Заполненный объем багажника
+
+    enum Action {
+        case startEngine
+        case stopEngine
+        case openWindows
+        case closeWindows
+        case loadCargo(volume: Double)
+        case unloadCargo(volume: Double)
+    }
+
+    mutating func performAction(_ action: Action) {
+        switch action {
+        case .startEngine:
+            isEngineRunning = true
+            print("Двигатель запущен")
+        case .stopEngine:
+            isEngineRunning = false
+            print("Двигатель заглушен")
+        case .openWindows:
+            areWindowsOpen = true
+            print("Окна открыты")
+        case .closeWindows:
+            areWindowsOpen = false
+            print("Окна закрыты")
+        case .loadCargo(let volume):
+            if trunkFilledVolume + volume <= trunkCapacity {
+                trunkFilledVolume += volume
+                print("Загружено \(volume) м3. Заполнено багажника: \(trunkFilledVolume) м3")
+            } else {
+                print("Невозможно загрузить, недостаточно места в багажнике.")
+            }
+        case .unloadCargo(let volume):
+            if trunkFilledVolume >= volume {
+                trunkFilledVolume -= volume
+                print("Выгружено \(volume) м3. Осталось в багажнике: \(trunkFilledVolume) м3")
+            } else {
+                print("Невозможно выгрузить, в багажнике нет такого объема.")
+            }
+        }
+    }
+}
+
+struct Truck: Hashable { // Добавляем соответствие Hashable
+    let brand: String
+    let year: Int
+    var cargoCapacity: Double
+    var isEngineRunning: Bool = false
+    var areWindowsOpen: Bool = false
+    var cargoLoadedVolume: Double = 0.0
+
+    enum Action {
+        case startEngine
+        case stopEngine
+        case openWindows
+        case closeWindows
+        case loadCargo(volume: Double)
+        case unloadCargo(volume: Double)
+    }
+
+    mutating func performAction(_ action: Action) {
+        switch action {
+        case .startEngine:
+            isEngineRunning = true
+            print("Двигатель запущен")
+        case .stopEngine:
+            isEngineRunning = false
+            print("Двигатель заглушен")
+        case .openWindows:
+            areWindowsOpen = true
+            print("Окна открыты")
+        case .closeWindows:
+            areWindowsOpen = false
+            print("Окна закрыты")
+        case .loadCargo(let volume):
+            if cargoLoadedVolume + volume <= cargoCapacity {
+                cargoLoadedVolume += volume
+                print("Загружено \(volume) м3. Загружено кузова: \(cargoLoadedVolume) м3")
+            } else {
+                print("Невозможно загрузить, недостаточно места в кузове.")
+            }
+        case .unloadCargo(let volume):
+            if cargoLoadedVolume >= volume {
+                cargoLoadedVolume -= volume
+                print("Выгружено \(volume) м3. Осталось в кузове: \(cargoLoadedVolume) м3")
+            } else {
+                print("Невозможно выгрузить, в кузове нет такого объема.")
+            }
+        }
+    }
+}
+
+// MARK: - Задание 2: Инициализация и применение действий
+
+let car1 = Car(brand: "Toyota", year: 2020, trunkCapacity: 0.5)
+let car2 = Car(brand: "BMW", year: 2022, trunkCapacity: 0.7)
+let truck1 = Truck(brand: "Volvo", year: 2018, cargoCapacity: 10.0)
+
+var dict: [AnyHashable: String] = [:] // Словарь с AnyHashable ключом для структур
+
+dict[car1] = "Car1 - \(car1.brand)"
+dict[car2] = "Car2 - \(car2.brand)"
+dict[truck1] = "Truck1 - \(truck1.brand)"
+
+print("\nСловарь с автомобилями:")
+for (car, description) in dict {
+    if let carValue = car as? Car {
+        print("\(description), Год выпуска: \(carValue.year)")
+    } else if let truckValue = car as? Truck {
+        print("\(description), Год выпуска: \(truckValue.year)")
+    }
+}
+
+var car1Copy = car1 // Важно для демонстрации mutating
+var truck1Copy = truck1 // Важно для демонстрации mutating
+
+car1Copy.performAction(.startEngine)
+car1Copy.performAction(.loadCargo(volume: 0.3))
+car1Copy.performAction(.unloadCargo(volume: 0.1))
+car1Copy.performAction(.stopEngine)
+
+truck1Copy.performAction(.startEngine)
+truck1Copy.performAction(.loadCargo(volume: 5.0))
+truck1Copy.performAction(.unloadCargo(volume: 2.0))
+truck1Copy.performAction(.stopEngine)
+
+// MARK: - Задание 3: Capture Lists (Объяснение и пример)
+
+/*
+ Capture Lists (списки захвата) используются в замыканиях для управления способом захвата переменных из внешней области видимости.  Они позволяют указать, как замыкание должно хранить значения переменных, используемых внутри замыкания, чтобы избежать потенциальных проблем, таких как утечки памяти из-за циклов сильной ссылки (strong reference cycles).
+
+ Основные моменты о списках захвата:
+
+ *   **[weak self]**:  Захватывает `self` (ссылку на текущий объект) как слабую ссылку.  Это предотвращает цикл сильной ссылки.  Если объект `self` уничтожен, слабая ссылка становится `nil`.
+ *   **[unowned self]**: Захватывает `self` как `unowned` ссылку. `unowned` ссылка предполагает, что объект всегда будет существовать.  Использование `unowned`  может привести к краху приложения, если объект уничтожен до того, как будет выполнено замыкание.
+ *   **[variable = value]**:  Позволяет захватить значение переменной или константы.  В этом случае, внутри замыкания будет использоваться копия значения.
+
+ Пример (иллюстрирует `weak self` для избежания циклов сильных ссылок):
+ */
+
+class MyClass {
+    var name: String
+    var closure: (() -> Void)?
+
+    init(name: String) {
+        self.name = name
+        print("MyClass init - \(name)")
+    }
+
+    func doSomething() {
+        closure = { [weak self] in // Weak self для избежания циклов
+            guard let self = self else {
+                print("self is nil (MyClass has been deallocated)")
+                return
+            }
+            print("Doing something with \(self.name)")
+        }
+        closure?() // Запускаем замыкание
+    }
+
+    deinit {
+        print("MyClass deinit - \(name)")
+    }
+}
+
+var myObject: MyClass? = MyClass(name: "Test Object")
+myObject?.doSomething()
+myObject = nil // Освобождаем объект - вызов deinit
+// Скриншот будет содержать вывод в консоль, иллюстрирующий, что объект был освобожден.  То есть  "MyClass deinit - Test Object"  должно быть выведено.  Если бы не было [weak self], то деинициализация не произошла бы, т.к. было бы создано циклическая ссылка.
+
+// MARK: - Задание 4: Решение проблемы с мужчиной и паспортом
+
+/*
+ Проблема на скриншоте заключается в том, что возникает цикл сильных ссылок между классами `Man` и `Passport`. `Man` имеет сильную ссылку на `Passport` (`var passport: Passport?`), и `Passport` имеет сильную ссылку на `Man` (`let man: Man`). Это приводит к тому, что ни один из объектов не может быть освобожден из памяти, даже если на них больше нет ссылок извне.
+
+ Решение:  Чтобы разорвать цикл сильных ссылок, нужно сделать одну из ссылок слабой (weak) или бесхозной (unowned). В данном случае, нужно сделать ссылку из класса `Man` на класс `Passport` слабой, чтобы класс `Man` мог быть удален, даже если у него есть паспорт.
+ */
+
+class Man {
+    weak var passport: Passport?  // Слабая ссылка на паспорт
+    let name: String
+
+    init(name: String) {
+        self.name = name
+        print("Man \(name) создан")
+    }
+
+    deinit {
+        print("Man \(name) удален из памяти")
+    }
+}
+
+class Passport {
+    let man: Man // Константная ссылка на владельца
+
+    init(man: Man) {
+        self.man = man
+        print("Passport создан для \(man.name)")
+    }
+
+    deinit {
+        print("Passport удален из памяти")
+    }
+}
+
+// Пример использования
+var man: Man? = Man(name: "Иван")
+let passport = Passport(man: man!) // Создаем паспорт с владельцем
+man?.passport = passport // Привязываем паспорт к мужчине
+
+print("\nПосле создания man и passport:")
+
+man?.passport = nil // Отвязываем паспорт от мужчины - паспорт еще не удален
+print("Passport удален (через отвязку от man): \(passport.man.name)")
+man = nil // Освобождаем мужчину - удаление паспорта произойдет автоматически
+
+print("\nПосле удаления man:")
