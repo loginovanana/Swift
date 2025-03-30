@@ -1,0 +1,79 @@
+// MARK: - Задание 1: Сортировка массива с помощью замыкания
+
+let numbers = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]
+
+// Сортировка по возрастанию
+let ascendingSortedNumbers = numbers.sorted { $0 < $1 }
+print("Отсортировано по возрастанию: \(ascendingSortedNumbers)")
+
+// Сортировка по убыванию
+let descendingSortedNumbers = numbers.sorted { $0 > $1 }
+print("Отсортировано по убыванию: \(descendingSortedNumbers)")
+
+
+// MARK: - Задание 2: Работа с именами друзей
+
+// Функция, принимающая имена друзей и возвращающая массив
+func createFriendsArray(friendNames: String...) -> [String] {
+    return friendNames
+}
+
+// Создаем массив имен друзей
+var friends = createFriendsArray(friendNames: "Nastja", "Anna", "Barbara", "Dima", "Katja", "Yulia")
+
+// Сортируем массив по количеству букв в имени
+friends.sort { $0.count < $1.count }
+print("\nДрузья, отсортированные по длине имени: \(friends)")
+
+// Создаем словарь, где ключ - количество символов в имени, а значение - имя друга
+var friendsDictionary: [Int: String] = [:]
+for friend in friends {
+    friendsDictionary[friend.count] = friend
+}
+
+print("\nСловарь с длиной имени в качестве ключа: \(friendsDictionary)")
+
+// Функция, принимающая ключ и выводящая ключ и значение из словаря
+func printFriendInfo(key: Int, dictionary: [Int: String]) {
+    if let friendName = dictionary[key] {
+        print("Длина имени: \(key), Имя друга: \(friendName)")
+    } else {
+        print("Друг с длиной имени \(key) не найден.")
+    }
+}
+
+// Пример использования функции
+print("\nИнформация о друге:")
+printFriendInfo(key: 3, dictionary: friendsDictionary) // Выведет информацию об "Bob"
+printFriendInfo(key: 5, dictionary: friendsDictionary) // Выведет "Друг с длиной имени 5 не найден."
+
+// MARK: - Задание 3: Проверка массивов на пустоту и добавление значений
+
+func checkAndFillArrays(stringArray: inout [String], intArray: inout [Int]) {
+    if stringArray.isEmpty {
+        stringArray.append("Default String")
+        print("\nСтроковый массив был пуст. Добавлено значение: \(stringArray)")
+    } else {
+        print("\nСтроковый массив не пуст: \(stringArray)")
+    }
+
+    if intArray.isEmpty {
+        intArray.append(0)
+        print("Числовой массив был пуст. Добавлено значение: \(intArray)")
+    } else {
+        print("Числовой массив не пуст: \(intArray)")
+    }
+}
+
+// Создаем массивы (один пустой, другой - нет)
+var emptyStrings: [String] = []
+var someNumbers: [Int] = [1, 2, 3]
+
+// Проверяем и заполняем массивы
+checkAndFillArrays(stringArray: &emptyStrings, intArray: &someNumbers)
+
+// Пример с обоими пустыми массивами
+var emptyStrings2: [String] = []
+var emptyNumbers2: [Int] = []
+
+checkAndFillArrays(stringArray: &emptyStrings2, intArray: &emptyNumbers2)
