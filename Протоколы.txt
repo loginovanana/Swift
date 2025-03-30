@@ -1,0 +1,154 @@
+import Foundation
+
+// MARK: - Задание 1: Copy-on-Write (CoW)
+
+/*
+ Copy-on-Write (CoW) - это техника оптимизации, используемая для снижения затрат на копирование данных. Вместо того чтобы создавать полную копию данных при каждом изменении, CoW откладывает фактическое копирование до тех пор, пока данные не будут изменены. Если данные не изменяются, все копии продолжают ссылаться на одни и те же данные в памяти. Когда же одна из копий изменяется, тогда и происходит фактическое копирование данных, и измененная копия начинает ссылаться на новые данные в памяти.
+
+ Это особенно полезно для структур (struct), которые по умолчанию передаются по значению (copy by value). Без CoW каждое изменение структуры приводило бы к созданию новой копии данных, что могло бы быть дорогостоящим для больших структур.
+ */
+
+// MARK: - Задание 2: Структура IOSCollection с CoW
+
+struct IOSCollection {
+    private var _items: [String]
+    private var _refCount: Int = 1 // Счетчик ссылок
+
+    init(items: [String]) {
+        self._items = items
+    }
+
+    // Getter для доступа к элементам массива
+    var items: [String] {
+        mutating get {
+            if !isKnownUniquelyReferenced(&_items) {
+                _items = _items  // Создаем копию при чтении, если на нее ссылаются несколько экземпляров
+                print("Copy was made for read access")
+            }
+            return _items
+        }
+    }
+
+    mutating func append(item: String) {
+        if !isKnownUniquelyReferenced(&_items) {
+            _items = _items  // Создаем копию перед записью, если на нее ссылаются несколько экземпляров
+            print("Copy was made for write access")
+        }
+        _items.append(item)
+    }
+    // для видеоурока
+    func printArrayInfo() {
+            print("Elements: \(_items), isUnique: \(isKnownUniquelyReferenced(&_items))")
+    }
+}
+
+// Пример использования
+var collection1 = IOSCollection(items: ["Swift", "Objective-C"])
+var collection2 = collection1
+print("Collection 1:")
+collection1.printArrayInfo()
+print("Collection 2:")
+collection2.printArrayInfo()
+collection2.append(item: "SwiftUI") // Здесь произойдет копирование
+print("\nAfter append to collection 2")
+print("Collection 1:")
+collection1.printArrayInfo()
+print("Collection 2:")
+collection2.printArrayInfo()
+// MARK: - Задание 3: Протокол Hotel и класс HotelAlfa
+
+protocol Hotel {
+    init(roomCount: Int)
+    var roomCount: Int { get set }
+}
+
+class HotelAlfa: Hotel {
+    var roomCount: Int
+
+    required init(roomCount: Int) {
+        self.roomCount = roomCount
+    }
+}
+
+// MARK: - Задание 4: Протокол GameDice и расширение Int
+
+protocol GameDice {
+    var numberDice: String { get }
+}
+
+extension Int: GameDice {
+    var numberDice: String {
+        return "Выпало \(self) на кубике"
+    }
+}
+
+let diceCoub = 4
+print(diceCoub.numberDice)
+
+// MARK: - Задание 5: Протокол с опциональным свойством
+
+protocol SomeProtocol {
+    var requiredProperty: String { get }
+    var optionalProperty: Int? { get set } // Явно опциональное свойство
+    func someMethod()
+}
+
+class SomeClass: SomeProtocol {
+    var requiredProperty: String = "Обязательное свойство"
+    // Реализуем только обязательное свойство
+    func someMethod() {
+        print ("Hello")
+    }
+}
+
+// MARK: - Задание 6: Протоколы и Делегирование
+
+/*
+ (Обратитесь к документации по Swift для изучения раздела "Протоколы -> Делегирование").
+ */
+
+// MARK: - Задание 7: Протоколы для Компании
+
+enum Platform: String {
+    case ios, android, web
+}
+
+protocol Coding {
+    var time: TimeInterval { get }
+    var amountOfCode: Int { get }
+    func writeCode(platform: Platform, numberOfSpecialist: Int)
+}
+
+protocol StopCoding {
+    func stopCoding()
+}
+
+class Company: Coding, StopCoding {
+    var numberOfProgrammers: Int
+    var specializations: [Platform]
+    var time: TimeInterval = 0
+    var amountOfCode: Int = 0
+
+    init(numberOfProgrammers: Int, specializations: [Platform]) {
+        self.numberOfProgrammers = numberOfProgrammers
+        self.specializations = specializations
+    }
+
+    func writeCode(platform: Platform, numberOfSpecialist: Int) {
+        if specializations.contains(platform) && numberOfSpecialist <= numberOfProgrammers {
+             print("Разработка на \(platform) началась.  Пишем код...")
+        } else {
+            print("Недостаточно ресурсов для разработки на \(platform) или нет специализации.")
+        }
+    }
+
+    func stopCoding() {
+        print("Работа закончена. Сдаю в тестирование.")
+    }
+}
+
+// Пример использования
+let myCompany = Company(numberOfProgrammers: 5, specializations: [.ios, .web])
+myCompany.writeCode(platform: .ios, numberOfSpecialist: 3)
+myCompany.stopCoding()
+
