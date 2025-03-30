@@ -1,0 +1,211 @@
+import Foundation
+
+// MARK: - Задание 1: Классы родитель и наследники
+
+// Класс родитель
+class Animal {
+    var name: String
+
+    init(name: String) {
+        self.name = name
+    }
+
+    func makeSound() {
+        print("Неизвестный звук")
+    }
+}
+
+// Класс наследник 1
+class Dog: Animal {
+    override func makeSound() {
+        print("Гав!")
+    }
+}
+
+// Класс наследник 2
+class Cat: Animal {
+    override func makeSound() {
+        print("Мяу!")
+    }
+}
+
+// MARK: - Задание 2: Класс House
+
+class House {
+    var width: Double
+    var height: Double
+
+    init(width: Double, height: Double) {
+        self.width = width
+        self.height = height
+    }
+
+    func create() {
+        let area = width * height
+        print("Площадь дома: \(area)")
+    }
+
+    func destroy() {
+        print("Дом уничтожен!")
+    }
+}
+
+// MARK: - Задание 3: Класс для сортировки учеников
+
+class StudentSorter {
+    var students: [Student] = []
+
+    init(students: [Student]) {
+        self.students = students
+    }
+
+    func sortByName() {
+        students.sort { $0.name < $1.name }
+    }
+
+    func sortByAge() {
+        students.sort { $0.age < $1.age }
+    }
+
+    func sortByGrade() {
+        students.sort { $0.grade > $1.grade } // Сортируем по убыванию оценки
+    }
+
+    func printStudents() {
+        for student in students {
+            print("Имя: \(student.name), Возраст: \(student.age), Оценка: \(student.grade)")
+        }
+    }
+}
+
+// Структура для представления ученика
+struct Student {
+    var name: String
+    var age: Int
+    var grade: Double
+}
+
+// MARK: - Задание 4: Структура и класс (различия)
+
+/*
+ Структуры (struct) и классы (class) - это два основных типа данных в Swift.
+
+ Основные различия:
+
+ 1.  **Наследование:** Классы поддерживают наследование, а структуры - нет. Класс может наследоваться от другого класса, перенимая его свойства и методы, и расширять их. Структуры не могут наследоваться.
+ 2.  **Передача по значению vs. по ссылке:** Структуры передаются по значению (copy by value), а классы - по ссылке (copy by reference). При передаче структуры создается ее копия, а при передаче класса передается ссылка на существующий объект.
+ 3.  **Идентичность:** Классы имеют идентичность, то есть можно сравнить два экземпляра класса и узнать, ссылаются ли они на один и тот же объект в памяти. Структуры не имеют идентичности, их сравнивают по значению.
+ 4.  **Изменяемость:** В Swift структуры являются value type, которые по умолчанию неизменяемыми (immutable) Если нужно изменить свойство структуры, экземпляр структуры должен быть объявлен как переменная (var). Классы являются reference type, что подразумевает изменяемость (mutable).
+ 5.  **Инициализаторы:** Структуры получают автоматический инициализатор (memberwise initializer), который позволяет инициализировать все свойства структуры. Классы не получают автоматический инициализатор, и нужно создавать свой собственный.
+
+ Когда использовать структуры:
+
+ *   Когда нужно представлять простые типы данных (например, координаты точки, размеры прямоугольника).
+ *   Когда важна производительность и нужно избежать накладных расходов на управление памятью, связанных с классами.
+ *   Когда нужно гарантировать, что данные не будут изменены случайно.
+
+ Когда использовать классы:
+
+ *   Когда нужно представлять сложные объекты с состоянием и поведением.
+ *   Когда нужно использовать наследование и полиморфизм.
+ *   Когда нужно, чтобы несколько частей программы работали с одним и тем же объектом и видели все изменения, которые происходят с этим объектом.
+
+ */
+
+// Пример структуры
+struct Point {
+    var x: Double
+    var y: Double
+}
+
+// Пример класса
+class Rectangle {
+    var width: Double
+    var height: Double
+
+    init(width: Double, height: Double) {
+        self.width = width
+        self.height = height
+    }
+}
+
+// MARK: - Задание 5: Poker
+
+enum Suit: String, CaseIterable {
+    case hearts = "Червы"
+    case diamonds = "Бубны"
+    case clubs = "Крести"
+    case spades = "Пики"
+}
+
+enum Rank: Int, CaseIterable {
+    case two = 2, three, four, five, six, seven, eight, nine, ten
+    case jack, queen, king, ace
+
+    var stringValue: String {
+        switch self {
+        case .jack: return "Валет"
+        case .queen: return "Дама"
+        case .king: return "Король"
+        case .ace: return "Туз"
+        default: return String(self.rawValue)
+        }
+    }
+}
+
+struct Card {
+    let suit: Suit
+    let rank: Rank
+
+    var description: String {
+        return "\(rank.stringValue) \(suit.rawValue)"
+    }
+}
+
+func generateDeck() -> [Card] {
+    var deck: [Card] = []
+    for suit in Suit.allCases {
+        for rank in Rank.allCases {
+            deck.append(Card(suit: suit, rank: rank))
+        }
+    }
+    return deck
+}
+
+func drawHand(deck: [Card]) -> [Card] {
+    var hand: [Card] = []
+    var deckCopy = deck // Копируем колоду, чтобы не изменять оригинал
+    for _ in 0..<5 {
+        let randomIndex = Int.random(in: 0..<deckCopy.count)
+        hand.append(deckCopy[randomIndex])
+        deckCopy.remove(at: randomIndex)
+    }
+    return hand
+}
+
+func evaluateHand(hand: [Card]) -> String {
+    // Простая реализация оценки (нужна более полная для всех комбинаций)
+    let suits = hand.map { $0.suit }
+    let ranks = hand.map { $0.rank.rawValue }.sorted()
+
+    let allSameSuit = suits.allSatisfy { $0 == suits.first }
+    let isStraight = ranks.indices.dropFirst().allSatisfy { ranks[$0] == ranks[$0 - 1] + 1 }
+
+    if allSameSuit && isStraight {
+        return "У вас \(hand[0].suit.rawValue) стрит флеш"
+    } else if allSameSuit{
+        return "У вас \(hand[0].suit.rawValue) флеш"
+    }
+    else if isStraight{
+        return "У вас стрит"
+    } else {
+        return "У вас обычная рука"
+    }
+}
+
+var deck = generateDeck()
+var hand = drawHand(deck: deck)
+
+let result = evaluateHand(hand: hand)
+print("\nПокер: \(result)")
+print("Рука: \(hand.map { $0.description })")
