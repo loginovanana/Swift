@@ -1,0 +1,90 @@
+/ MARK: - Изучение типов данных
+
+// Целые числа
+let age: Int = 30
+let numberOfStudents: UInt = 150 // UInt - беззнаковое целое число (>= 0)
+let maxIntValue: Int = Int.max
+let minIntValue: Int = Int.min
+
+// Числа с плавающей точкой
+let height: Float = 1.75 // 32-битное число с плавающей точкой
+let pi: Double = 3.14159265359 // 64-битное число с плавающей точкой
+let temperature: Double = 25.5
+
+// Булевые значения
+let isStudent: Bool = true
+let isEmployed: Bool = false
+
+// Строки
+let name: String = "Loginova Anastasia"
+let city: String = "Saint Peterburg"
+
+// Символы (редко используются напрямую)
+let initial: Character = "L"
+
+// MARK: - Изучение интерполяции строк
+
+// Интерполяция строк позволяет вставлять значения переменных прямо в строку
+let greeting: String = "Hello, my name is \(name) and I am from \(city)."
+let ageGreeting: String = "I am \(age) years old."
+let temperatureString: String = "The temperature is \(temperature) degrees Celsius."
+
+// Интерполяция строк позволяет выполнять вычисления
+let doubleAge: Int = age * 2
+let doubleAgeString: String = "In the future I will be \(doubleAge) years old."
+
+// MARK: - Сводная информация о себе и вывод в консоль
+
+let myName: String = "Loginova Anastasia"
+let myAge: Int = 21
+let myCity: String = "Saint Peterburg"
+let myHeight: Double = 1.69
+let amIEmployed: Bool = true
+
+var employmentStatus: String {
+    if amIEmployed {
+        return "I am currently employed."
+    } else {
+        return "I am currently unemployed."
+    }
+}
+
+// Создание сводной информации с использованием интерполяции строк
+let aboutMe: String = """
+My name is \(myName).
+I am \(myAge) years old.
+I live in \(myCity).
+My height is \(myHeight) meters.
+\(employmentStatus)
+"""
+
+// Вывод сводной информации в консоль
+print(aboutMe)
+
+
+// Дополнительные примеры
+
+// Использование enum для статуса занятости
+enum EmploymentStatus {
+    case employed
+    case unemployed
+    case student
+}
+
+let myEmploymentStatus: EmploymentStatus = .employed
+
+let employmentStatusString: String
+switch myEmploymentStatus {
+case .employed:
+    employmentStatusString = "I am currently employed."
+case .unemployed:
+    employmentStatusString = "I am currently unemployed."
+case .student:
+    employmentStatusString = "I am currently a student."
+}
+
+// Более лаконичная интерполяция строк
+let aboutMe2: String = "My name is \(myName), I am \(myAge) years old, and I live in \(myCity).  My height is \(myHeight) meters. \(employmentStatusString)"
+
+print("\nAlternative summary:")
+print(aboutMe2)
